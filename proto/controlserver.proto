@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+option go_package = "Client/proto";
+
+package proto;
+
+service ControlService {
+  rpc SendRobotStatus (stream RobotStatusData) returns (RobotStatusReply) {}
+  rpc SendLocationStatus (stream LocationStatusData) returns (LocationStatusReply) {}
+  rpc SendWaypointStream (stream WaypointStreamData) returns (LocationStatusReply) {}
+  rpc GetRobotSetModeStream (GetRobotSetModeRequest) returns (stream GetRobotSetModeData) {}
+  rpc GetWaypointsStream (GetWaypointsRequest) returns (stream WaypointsData) {}
+  rpc GetPeripheralControlStream (GetPeripheralControlRequest) returns (stream Peripherals) {}
+  rpc GetJoystickControlStream (GetJoystickControlRequest) returns (stream VehicleThrustTorque) {}
+}
+
+message VehicleControlMode {
+  bool manual = 1;
+  bool offboard = 2;
+  bool auto = 3;
+}
+
+message ClearbotControlMode {
+  bool joystick_control = 1;
+  bool obstacle_avoidance = 2;
+  bool heading_control = 3;
+  bool waypoint_control = 4;
+}
+
+message Peripherals {
+  bool conveyor = 1;
+}
+
+message SystemInfo {  
+  float temperature = 1;
+}
+
+message RobotStatusData {
+  int32 robot_id = 1;
+  bool arm_state = 2;
+  VehicleControlMode vehicle_control_mode = 3;
+  ClearbotControlMode clearbot_control_mode = 4;
+  Peripherals peripherals = 5;
+  SystemInfo system_info = 6;
+}
+
+message RobotStatusReply {}
+
+message Coordinates {
+  float latitude = 1;
+  float longitude = 2;
+  float altitude = 3;
+}
+
+message Vector3f {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message LocationStatusData {
+  int32 robot_id = 1;
+  Coordinates current_position = 2;
+  Coordinates home_position = 3;
+  Vector3f velocity = 4;
+  float heading = 5;
+}
+
+message LocationStatusReply {}
+
+message Waypoint {
+  float x = 1;
+  float y = 2;
+}
+
+message ClearbotWaypoints {
+  Waypoint current_wp = 1;
+  repeated Waypoint remaining_wps = 2;
+  repeated Waypoint finished_wps = 3;
+}
+
+message WaypointStreamData {
+  int32 robot_id = 1;
+  ClearbotWaypoints waypoints = 2;
+  Coordinates start_position = 3;
+  Coordinates ref_position = 4;
+  float wp_dist = 5;
+}
+
+message WaypointStreamReply {}
+
+message GetRobotSetModeRequest {
+  int32 robot_id = 1;
+}
+
+message GetRobotSetModeData {
+  string mode = 1;
+}
+
+message GetWaypointsRequest {
+  int32 robot_id = 1;
+}
+
+message WaypointsData {
+  repeated Waypoint waypoints = 1;
+}
+
+message GetPeripheralControlRequest {
+  int32 robot_id = 1;
+}
+
+message GetJoystickControlRequest {
+  int32 robot_id = 1;
+}
+
+message VehicleThrustTorque {
+  float throttle = 1;
+  float yaw = 2;
+}
